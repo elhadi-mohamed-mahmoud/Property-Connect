@@ -1,0 +1,376 @@
+# Replit.ai Prompt: Real Estate Listings Platform
+
+Create a full-stack real estate listings platform. This is a property marketplace where users can browse, create, and manage property listings with an interactive map interface.
+
+## What This App Does
+
+A real estate platform where:
+- Property owners can list their properties for sale or rent
+- Buyers/renters can search and browse available properties
+- Users can view properties on an interactive map
+- Users can save favorite properties
+- The app supports multiple languages (English, Arabic, French)
+- Everything works on mobile phones, tablets, and computers
+
+## Core Features
+
+### 1. User Accounts
+
+**Registration:**
+- Users can create an account with email and password
+- Password must be strong (at least 8 characters, include uppercase, lowercase, and numbers)
+- Users provide their name and a display name
+- Optional: phone number, WhatsApp number, preferred language
+- Users must confirm their password matches
+
+**Login:**
+- Users log in with email and password
+- Once logged in, they stay logged in until they log out
+
+**Logout:**
+- Users can log out, which ends their session
+
+**Access Control:**
+- Only logged-in users can create listings
+- Users can only edit or delete their own listings
+- Users can view their own profile and listings
+
+### 2. Property Listings
+
+**Creating a Listing:**
+When a user wants to list a property, they fill out a form with:
+- Property title (required)
+- Description of the property (required, can be multiple paragraphs)
+- Price (required, must be a number)
+- Currency (defaults to MRU, but can be changed)
+- Location description (required, like "Downtown, Main Street")
+- Location on map (required - user clicks on a map to set the exact location)
+- Type: For Sale or For Rent (required)
+- Category: Land, House, Apartment, or Commercial property (required)
+- Photos: At least 1 photo required, up to 10 photos maximum (each photo max 10MB)
+- Optional: Links to video tours
+- Optional: TikTok URL, Facebook URL
+- Contact name (automatically filled from user's profile, but can be changed)
+- Contact phone number (required)
+- Optional: WhatsApp number
+- Optional: Number of bedrooms, bathrooms, and property size in square meters
+
+The form should:
+- Show previews of uploaded images before submitting
+- Validate all required fields
+- Show helpful error messages if something is wrong
+- Show success message when listing is created
+
+**Browsing Listings:**
+Users can view listings in two ways:
+
+**Grid View:**
+- Shows listings as cards in a grid
+- Each card shows:
+  - Main property photo
+  - Property titlea
+  - Location (clicking opens Google Maps)
+  - Price and currency
+  - Badge showing if it's for Sale or Rent
+  - Badge showing property category (House, Apartment, etc.)
+  - "Sold" badge if the property is sold
+  - Property details (bedrooms, bathrooms, size) if available
+  - Heart icon to save as favorite (only if logged in)
+
+**Map View:**
+- Shows all listings as markers on an interactive map
+- Clicking a marker shows a popup with:
+  - Property photo thumbnail
+  - Property title
+  - Price
+  - "View Details" button
+- Map automatically adjusts to show all listings
+- Users can toggle between grid view and map view
+
+**Viewing a Single Listing:**
+When a user clicks on a listing, they see a detailed page with:
+
+**Image Gallery:**
+- Large main image at the top
+- Row of thumbnail images below
+- Clicking an image opens a fullscreen gallery where users can:
+  - Navigate with arrow keys or on-screen buttons
+  - See which image they're viewing (e.g., "3 of 10")
+  - Close with Escape key or close button
+
+**Property Information:**
+- Property title
+- Badges showing: Sale/Rent status, property category, and if it's sold
+- Price prominently displayed
+- Location with a link to open in Google Maps or Apple Maps
+- Property details: number of bedrooms, bathrooms, and size in square meters (if provided)
+- Full description with proper paragraph formatting
+- Links to video tours (if provided)
+- Links to TikTok and Facebook posts (if provided)
+
+**Map:**
+- Interactive map showing the exact property location
+- Clicking the map opens it in Google Maps or Apple Maps
+
+**Contact Information:**
+- "Call" button that shows the phone number (on desktop) or directly calls (on mobile)
+- "WhatsApp" button if WhatsApp number is available
+- Information card showing who listed the property
+
+**Actions:**
+- Heart button to save as favorite (if logged in)
+- Share button that copies the listing link to clipboard
+- View counter showing how many people have viewed this listing
+- If the user owns this listing, they also see:
+  - Edit button to modify the listing
+  - Toggle to mark as Sold or Available
+  - Delete button (asks for confirmation before deleting)
+
+**Editing a Listing:**
+- Property owners can edit their own listings
+- The edit form is the same as the create form, but pre-filled with existing data
+- Owners can add or remove photos
+- Same validation rules apply as when creating
+
+**Deleting a Listing:**
+- Only the property owner can delete their listing
+- System asks for confirmation before deleting
+- When a listing is deleted, it's also removed from everyone's favorites
+
+### 3. Search & Filtering
+
+**Search:**
+- Users can type in a search box to find properties
+- Search looks through both property titles and descriptions
+- Search happens automatically as the user types (with a small delay)
+- Clear button appears when there's text in the search box
+
+**Filters:**
+Users can filter listings by:
+- Category: All, House, Apartment, Land, or Commercial
+- Type: All, For Sale, or For Rent
+- Price range: Set minimum and/or maximum price
+- Number of bedrooms
+- Number of bathrooms
+- Property size: Set minimum and/or maximum size in square meters
+
+**Sorting:**
+Users can sort listings by:
+- Date (newest listings first)
+- Price (lowest to highest)
+- Price (highest to lowest)
+
+**Filter Interface:**
+- On desktop: Filters appear in an expandable section
+- On mobile: Filters appear in a slide-out drawer
+- Active filters show as removable badges
+- "Clear all filters" button to reset everything
+
+**Pagination:**
+- Shows 12 listings per page
+- Page numbers with "..." for many pages
+- Previous and Next buttons
+- Shows which listings are displayed (e.g., "Showing 1-12 of 45 listings")
+
+### 4. Map Features
+
+**Interactive Map:**
+- Map shows all property listings as markers
+- Default view centers on a major city (coordinates: 18.0735, -15.9582)
+- Clicking a marker shows a popup with:
+  - Property photo thumbnail
+  - Property title
+  - Price
+  - "View Details" button to see full listing
+- Map automatically adjusts to show all listings when viewing multiple properties
+
+**Location Selection:**
+- When creating or editing a listing, users click on the map to set the property location
+- A marker appears at the selected location
+- Coordinates are saved with the listing
+
+**Map Links:**
+- Location text is clickable and opens in Google Maps
+- On Apple devices (iPhone/iPad), also shows option to open in Apple Maps
+- Map on listing detail page can be clicked to open in external map apps
+
+### 5. Favorites System
+
+- Users can save listings as favorites by clicking a heart icon
+- Heart icon appears on listing cards and on the listing detail page
+- Heart fills in when a listing is favorited
+- Only logged-in users can save favorites
+- Users have a "Favorites" page where they can see all their saved listings
+- Users can remove favorites by clicking the heart again
+
+### 6. User Profiles
+
+**Viewing a Profile:**
+- Shows user's information (name, display name)
+- Shows profile picture if they have one
+- Lists all properties that user has posted
+- Shows contact information
+
+**Editing Profile:**
+- Users can edit their own profile
+- Can update: name, display name, phone number, WhatsApp number
+- Can upload or change profile picture
+- Can change preferred language
+
+### 7. Multi-language Support
+
+**Languages:**
+- English (default)
+- Arabic (with right-to-left text support)
+- French
+
+**How It Works:**
+- Language switcher appears in the header/navigation
+- All text in the app (buttons, labels, messages, etc.) changes when language is switched
+- Arabic text displays right-to-left
+- User's language preference is saved to their profile
+- When a user logs in, the app automatically uses their preferred language
+
+**What Needs Translation:**
+- All navigation items (Home, Create Listing, Login, Register, Profile, Favorites, Logout)
+- All form labels and placeholders
+- All filter options
+- All buttons (Save, Cancel, Delete, Edit, Share, etc.)
+- All messages (success messages, error messages, confirmations)
+- Property details labels (Bedrooms, Bathrooms, Size, etc.)
+- Property categories and types
+
+### 8. User Interface & Experience
+
+**Design:**
+- Modern, clean, and professional appearance
+- Works well on phones, tablets, and computers
+- Easy to use with touch screens
+- Clear, readable text with good color contrast
+- Buttons and clickable areas are large enough for easy tapping
+
+**User Feedback:**
+- Loading indicators when data is being fetched
+- Success messages when actions complete (like "Listing created successfully!")
+- Error messages that explain what went wrong and how to fix it
+- Confirmation dialogs before deleting important things
+- Empty states with helpful messages (like "No listings found, try adjusting your filters")
+
+**Visual Elements:**
+- Smooth animations and transitions
+- Hover effects on buttons and cards
+- Image previews before uploading
+- Badges to show property status (Sale/Rent, Sold, etc.)
+- Toast notifications that appear briefly to show messages
+
+### 9. Security & Data Protection
+
+**User Security:**
+- Passwords are securely stored (never stored as plain text)
+- Users must be logged in to create listings
+- Users can only edit or delete their own listings
+- Rate limiting prevents abuse (too many login attempts, too many requests)
+
+**Data Validation:**
+- Email addresses must be in valid format
+- Passwords must meet strength requirements
+- All required fields must be filled
+- Numbers must be in valid ranges (prices, sizes, coordinates)
+- URLs must be valid format
+- Only image files can be uploaded (not other file types)
+- File sizes are limited to prevent abuse
+
+### 10. Additional Features
+
+**View Tracking:**
+- Each listing tracks how many times it's been viewed
+- Views are shown on the listing detail page
+- Owner's own views don't count (to prevent inflating numbers)
+- Refreshing the page doesn't count as multiple views
+
+**Image Handling:**
+- Users can upload multiple images per listing
+- Images are stored securely
+- Only image files are accepted (JPEG, JPG, PNG, GIF, WebP)
+- Each image can be up to 10MB
+
+**Error Handling:**
+- Clear, helpful error messages when something goes wrong
+- Users see notifications explaining what happened
+- System handles network errors gracefully
+
+**Performance:**
+- Search doesn't fire on every keystroke (waits for user to stop typing)
+- Large lists are split into pages (12 items per page)
+- Images load efficiently
+- App responds quickly to user actions
+
+## Suggested Development Order
+
+1. **Start with the basics:**
+   - Set up user accounts (registration, login, logout)
+   - Create the database to store users and listings
+   - Build the homepage to show all listings
+   - Allow users to create listings
+
+2. **Add core features:**
+   - Add search and filtering
+   - Integrate the map view
+   - Add favorites functionality
+   - Add multi-language support
+   - Add image uploads
+
+3. **Enhance the experience:**
+   - Make it work well on mobile devices
+   - Add smooth animations
+   - Improve error messages
+   - Add loading indicators
+   - Add security measures
+
+## What the App Must Do
+
+The completed app should allow users to:
+
+✅ **Create an account and log in**
+✅ **Browse all property listings** (in grid or map view)
+✅ **Search and filter listings** by various criteria
+✅ **View detailed information** about each property
+✅ **Create new listings** (if logged in)
+✅ **Edit or delete their own listings**
+✅ **Save favorite listings** and view them later
+✅ **Switch between languages** (English, Arabic, French)
+✅ **Use the app on any device** (phone, tablet, computer)
+✅ **Upload multiple photos** for each listing
+✅ **See how many people viewed** their listings
+✅ **Contact property owners** via phone or WhatsApp
+✅ **Share listings** with others
+
+## Example User Journey
+
+**As a Property Buyer/Renter:**
+1. Visit the homepage and see all available properties
+2. Use search to find "apartments in downtown"
+3. Filter by price range and number of bedrooms
+4. Switch to map view to see properties by location
+5. Click on a property to see full details, photos, and map
+6. Save favorite properties by clicking the heart icon
+7. Contact the owner via phone or WhatsApp
+8. View all saved favorites on the Favorites page
+
+**As a Property Owner:**
+1. Register for an account
+2. Log in
+3. Click "Create Listing"
+4. Fill out the form with property details
+5. Upload photos of the property
+6. Click on the map to set the property location
+7. Submit the listing
+8. The listing appears in search results
+9. See how many people viewed the listing
+10. Edit the listing if needed
+11. Mark it as "Sold" when the property is sold
+12. Delete the listing if needed
+
+---
+
+**Note:** Build this as a complete, working real estate platform. Focus on making it functional and user-friendly. Ensure users can easily browse, search, create, and manage property listings with a great experience on all devices.
