@@ -19,6 +19,17 @@ export const userProfiles = pgTable("user_profiles", {
   phone: varchar("phone"),
   whatsapp: varchar("whatsapp"),
   preferredLanguage: languageEnum("preferred_language").default("en"),
+  isAdmin: boolean("is_admin").default(false).notNull(),
+});
+
+// App settings (singleton table for logo and support contacts)
+export const appSettings = pgTable("app_settings", {
+  id: varchar("id").primaryKey().default("default"),
+  logoUrl: varchar("logo_url"),
+  supportPhone: varchar("support_phone"),
+  supportWhatsapp: varchar("support_whatsapp"),
+  supportEmail: varchar("support_email"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Properties table
@@ -110,7 +121,14 @@ export const insertFavoriteSchema = createInsertSchema(favorites).omit({
   createdAt: true,
 });
 
-export const insertUserProfileSchema = createInsertSchema(userProfiles);
+export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({
+  isAdmin: true,
+});
+
+export const insertAppSettingsSchema = createInsertSchema(appSettings).omit({
+  id: true,
+  updatedAt: true,
+});
 
 // Types
 export type Property = typeof properties.$inferSelect;
@@ -120,6 +138,8 @@ export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
 export type PropertyView = typeof propertyViews.$inferSelect;
+export type AppSettings = typeof appSettings.$inferSelect;
+export type InsertAppSettings = z.infer<typeof insertAppSettingsSchema>;
 
 // Query filters type
 export interface PropertyFilters {
