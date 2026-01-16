@@ -3,6 +3,7 @@ import {
   favorites,
   userProfiles,
   propertyViews,
+  appSettings,
   type Property,
   type InsertProperty,
   type Favorite,
@@ -10,6 +11,8 @@ import {
   type UserProfile,
   type InsertUserProfile,
   type PropertyFilters,
+  type AppSettings,
+  type InsertAppSettings,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, ilike, gte, lte, desc, asc, sql, inArray } from "drizzle-orm";
@@ -37,6 +40,15 @@ export interface IStorage {
   // View tracking
   recordPropertyView(propertyId: string, viewerIp: string | null, userId: string | null): Promise<void>;
   hasViewedRecently(propertyId: string, viewerIp: string | null, userId: string | null): Promise<boolean>;
+  
+  // App Settings
+  getAppSettings(): Promise<AppSettings | undefined>;
+  updateAppSettings(settings: Partial<InsertAppSettings>): Promise<AppSettings>;
+  
+  // Admin operations
+  isUserAdmin(userId: string): Promise<boolean>;
+  adminDeleteProperty(id: string): Promise<boolean>;
+  setUserAdmin(userId: string, isAdmin: boolean): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -273,6 +285,53 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return result.length > 0;
+  }
+
+  async getAppSettings(): Promise<AppSettings | undefined> {
+    const [settings] = await db
+      .select()
+      .from(appSettings)
+      .where(eq(appSettings.id, "default"));
+    return settings;
+  }
+
+  async updateAppSettings(settings: Partial<InsertAppSettings>): Promise<AppSettings> {
+    const [updated] = await db
+      .insert(appSettings)
+      .values({ id: "default", ...settings, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: appSettings.id,
+        set: { ...settings, updatedAt: new Date() },
+      })
+      .returning();
+    return updated;
+  }
+
+  async isUserAdmin(userId: string): Promise<boolean> {
+    const profile = await this.getProfile(userId);
+    return profile?.isAdmin ?? false;
+  }
+
+  async adminDeleteProperty(id: string): Promise<boolean> {
+    // First delete related favorites
+    await db.delete(favorites).where(eq(favorites.propertyId, id));
+    
+    // Then delete property views
+    await db.delete(propertyViews).where(eq(propertyViews.propertyId, id));
+    
+    // Finally delete the property (no user check for admin)
+    const result = await db
+      .delete(properties)
+      .where(eq(properties.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async setUserAdmin(userId: string, isAdmin: boolean): Promise<void> {
+    await db
+      .update(userProfiles)
+      .set({ isAdmin })
+      .where(eq(userProfiles.userId, userId));
   }
 }
 

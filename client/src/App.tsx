@@ -13,6 +13,8 @@ import PropertyDetail from "@/pages/PropertyDetail";
 import CreateListing from "@/pages/CreateListing";
 import FavoritesPage from "@/pages/FavoritesPage";
 import ProfilePage from "@/pages/ProfilePage";
+import SupportPage from "@/pages/SupportPage";
+import AdminSettingsPage from "@/pages/AdminSettingsPage";
 import NotFound from "@/pages/not-found";
 
 function AppRoutes() {
@@ -34,6 +36,8 @@ function AppRoutes() {
       <Route path="/edit/:id" component={CreateListing} />
       <Route path="/favorites" component={FavoritesPage} />
       <Route path="/profile" component={ProfilePage} />
+      <Route path="/support" component={SupportPage} />
+      <Route path="/admin" component={AdminSettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );

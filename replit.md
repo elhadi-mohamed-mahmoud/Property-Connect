@@ -15,6 +15,13 @@ A comprehensive real estate marketplace where property owners can list propertie
 - Added view tracking with 1-hour deduplication
 - Fixed numeric field handling in forms using Zod preprocess
 - Replaced emoji flags with text codes in language selector
+- Added admin system with:
+  - Admin role flag in user profiles (isAdmin)
+  - App settings for logo and support contacts
+  - Admin can upload/change app logo
+  - Admin can manage support phone, WhatsApp, and email
+  - Admin can delete any property for content moderation
+  - Support page with clickable contact links
 
 ## User Preferences
 
@@ -73,6 +80,8 @@ client/
 │   │   ├── PropertyDetail.tsx   # Single property view
 │   │   ├── CreateListing.tsx    # Create/edit property form
 │   │   ├── FavoritesPage.tsx    # User's saved properties
+│   │   ├── SupportPage.tsx      # Support contact information
+│   │   ├── AdminSettingsPage.tsx # Admin settings (logo, contacts)
 │   │   └── ProfilePage.tsx      # User profile settings
 │   ├── contexts/        # React contexts
 │   │   └── LanguageContext.tsx  # Language/RTL state management
@@ -97,7 +106,7 @@ shared/
 - `GET /api/properties/:id` - Get single property (with view tracking)
 - `POST /api/properties` - Create property (authenticated)
 - `PATCH /api/properties/:id` - Update property (owner only)
-- `DELETE /api/properties/:id` - Delete property (owner only)
+- `DELETE /api/properties/:id` - Delete property (owner or admin)
 - `GET /api/my-properties` - Get current user's properties
 
 ### Favorites
@@ -113,13 +122,19 @@ shared/
 ### Uploads
 - `POST /api/upload` - Upload images (returns array of URLs)
 
+### App Settings & Admin
+- `GET /api/app-settings` - Get app settings (logo, support contacts) - public
+- `PATCH /api/app-settings` - Update app settings (admin only)
+- `GET /api/admin/check` - Check if current user is admin
+
 ## Database Schema
 
 ### Tables
 - **properties**: Property listings with all details
 - **favorites**: User-property favorites (unique constraint)
-- **user_profiles**: Extended user information
+- **user_profiles**: Extended user information (includes isAdmin flag)
 - **property_views**: View tracking with IP/user deduplication
+- **app_settings**: Application settings (logo URL, support contacts)
 - **sessions**: PostgreSQL session store
 
 ## External Dependencies

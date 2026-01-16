@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Plus, Heart, User, LogOut, Menu, Globe, ChevronDown } from "lucide-react";
+import { Home, Plus, Heart, User, LogOut, Menu, Globe, ChevronDown, Headphones, Settings } from "lucide-react";
 import { useState } from "react";
+import type { AppSettings } from "@shared/schema";
 
 const languages = [
   { code: "en", name: "English", shortCode: "EN" },
@@ -28,7 +30,17 @@ export function Header() {
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const { data: appSettings } = useQuery<AppSettings>({
+    queryKey: ["/api/app-settings"],
+  });
+
+  const { data: adminCheck } = useQuery<{ isAdmin: boolean }>({
+    queryKey: ["/api/admin/check"],
+    enabled: isAuthenticated,
+  });
+
   const currentLanguage = languages.find((l) => l.code === language);
+  const isAdmin = adminCheck?.isAdmin ?? false;
 
   const navItems = [
     { href: "/", label: t("nav.home"), icon: Home },
@@ -38,6 +50,7 @@ export function Header() {
           { href: "/favorites", label: t("nav.favorites"), icon: Heart },
         ]
       : []),
+    { href: "/support", label: t("support.title"), icon: Headphones },
   ];
 
   const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
@@ -63,9 +76,18 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer" data-testid="logo">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Home className="h-5 w-5 text-primary-foreground" />
-            </div>
+            {appSettings?.logoUrl ? (
+              <img
+                src={appSettings.logoUrl}
+                alt="PropFind"
+                className="h-8 w-auto object-contain"
+                data-testid="img-app-logo"
+              />
+            ) : (
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                <Home className="h-5 w-5 text-primary-foreground" />
+              </div>
+            )}
             <span className="font-bold text-xl hidden sm:inline">PropFind</span>
           </div>
         </Link>
@@ -122,6 +144,14 @@ export function Header() {
                     {t("nav.profile")}
                   </DropdownMenuItem>
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin">
+                    <DropdownMenuItem className="cursor-pointer" data-testid="nav-admin">
+                      <Settings className="h-4 w-4 mr-2" />
+                      {t("admin.settings")}
+                    </DropdownMenuItem>
+                  </Link>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer text-destructive"

@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
-import { insertPropertySchema } from "@shared/schema";
+import { insertPropertySchema, insertAppSettingsSchema } from "@shared/schema";
 import { z } from "zod";
 
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -171,7 +171,16 @@ export async function registerRoutes(
   app.delete("/api/properties/:id", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const deleted = await storage.deleteProperty(req.params.id, userId);
+      
+      // Check if user is admin - admins can delete any property
+      const isAdmin = await storage.isUserAdmin(userId);
+      
+      let deleted: boolean;
+      if (isAdmin) {
+        deleted = await storage.adminDeleteProperty(req.params.id);
+      } else {
+        deleted = await storage.deleteProperty(req.params.id, userId);
+      }
       
       if (!deleted) {
         return res.status(404).json({ message: "Property not found or unauthorized" });
@@ -285,6 +294,66 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error updating profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // App Settings endpoints (public read, admin-only write)
+  app.get("/api/app-settings", async (req, res) => {
+    try {
+      const settings = await storage.getAppSettings();
+      res.json(settings || {});
+    } catch (error) {
+      console.error("Error fetching app settings:", error);
+      res.status(500).json({ message: "Failed to fetch app settings" });
+    }
+  });
+
+  app.patch("/api/app-settings", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const isAdmin = await storage.isUserAdmin(userId);
+      
+      if (!isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Validate input
+      const validationSchema = z.object({
+        logoUrl: z.string().optional().nullable(),
+        supportPhone: z.string().optional().nullable(),
+        supportWhatsapp: z.string().optional().nullable(),
+        supportEmail: z.string().email().optional().nullable().or(z.literal("")),
+      });
+
+      const validated = validationSchema.parse(req.body);
+      
+      // Only update non-undefined fields
+      const updates: Record<string, string | null | undefined> = {};
+      if (validated.logoUrl !== undefined) updates.logoUrl = validated.logoUrl;
+      if (validated.supportPhone !== undefined) updates.supportPhone = validated.supportPhone;
+      if (validated.supportWhatsapp !== undefined) updates.supportWhatsapp = validated.supportWhatsapp;
+      if (validated.supportEmail !== undefined) updates.supportEmail = validated.supportEmail;
+
+      const settings = await storage.updateAppSettings(updates);
+      res.json(settings);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error updating app settings:", error);
+      res.status(500).json({ message: "Failed to update app settings" });
+    }
+  });
+
+  // Admin check endpoint
+  app.get("/api/admin/check", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const isAdmin = await storage.isUserAdmin(userId);
+      res.json({ isAdmin });
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      res.status(500).json({ message: "Failed to check admin status" });
     }
   });
 
