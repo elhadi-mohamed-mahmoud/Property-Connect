@@ -145,7 +145,7 @@ export function Header() {
                   </DropdownMenuItem>
                 </Link>
                 {isAdmin && (
-                  <Link href="/admin">
+                  <Link href="/admin/settings">
                     <DropdownMenuItem className="cursor-pointer" data-testid="nav-admin">
                       <Settings className="h-4 w-4 mr-2" />
                       {t("admin.settings")}

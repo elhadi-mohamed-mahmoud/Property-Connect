@@ -37,7 +37,7 @@ function AppRoutes() {
       <Route path="/favorites" component={FavoritesPage} />
       <Route path="/profile" component={ProfilePage} />
       <Route path="/support" component={SupportPage} />
-      <Route path="/admin" component={AdminSettingsPage} />
+      <Route path="/admin/settings" component={AdminSettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );
