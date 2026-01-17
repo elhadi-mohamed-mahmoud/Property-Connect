@@ -153,9 +153,11 @@ export default function CreateListing() {
       };
 
       if (isEditing) {
-        return await apiRequest("PATCH", `/api/properties/${id}`, payload);
+        const res = await apiRequest("PATCH", `/api/properties/${id}`, payload);
+        return await res.json();
       } else {
-        return await apiRequest("POST", "/api/properties", payload);
+        const res = await apiRequest("POST", "/api/properties", payload);
+        return await res.json();
       }
     },
     onSuccess: (result) => {
