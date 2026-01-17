@@ -101,6 +101,7 @@ export const propertyViewsRelations = relations(propertyViews, ({ one }) => ({
 // Insert schemas
 export const insertPropertySchema = createInsertSchema(properties).omit({
   id: true,
+  userId: true,
   views: true,
   createdAt: true,
   updatedAt: true,
