@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { PropertyGrid } from "@/components/PropertyGrid";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FilterPanel, ActiveFilters } from "@/components/FilterPanel";
@@ -250,29 +251,7 @@ export default function HomePage() {
         </Button>
       )}
 
-      <footer className="border-t bg-card mt-12">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">D</span>
-              </div>
-              <div>
-                <p className="font-bold text-lg">Dari.com</p>
-                <p className="text-xs text-muted-foreground">داري - Your Home Awaits</p>
-              </div>
-            </div>
-            <div className="text-center md:text-right">
-              <p className="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} Dari.com. All rights reserved.
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                dari.com | Real Estate Marketplace
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

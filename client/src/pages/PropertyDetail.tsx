@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ImageGallery } from "@/components/ImageGallery";
 import { PropertyMap } from "@/components/PropertyMap";
 import { Button } from "@/components/ui/button";
@@ -474,6 +475,7 @@ export default function PropertyDetail() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

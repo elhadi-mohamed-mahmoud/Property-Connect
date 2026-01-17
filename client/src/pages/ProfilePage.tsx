@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { PropertyGrid } from "@/components/PropertyGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -271,6 +272,7 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }

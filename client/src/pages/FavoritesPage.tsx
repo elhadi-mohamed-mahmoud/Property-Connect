@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { PropertyGrid } from "@/components/PropertyGrid";
 import { Button } from "@/components/ui/button";
 import { Heart, Loader2 } from "lucide-react";
@@ -88,6 +89,7 @@ export default function FavoritesPage() {
           emptyActionLabel={t("favorites.browse")}
         />
       </main>
+      <Footer />
     </div>
   );
 }

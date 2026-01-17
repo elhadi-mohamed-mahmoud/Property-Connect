@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { PropertyFilters } from "@shared/schema";
 
@@ -61,32 +61,40 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
     setLocalMaxSize(filters.maxSize?.toString() || "");
   }, [filters.minPrice, filters.maxPrice, filters.minSize, filters.maxSize]);
   
-  // Apply debounced values to filters
+  // Apply debounced values to filters using refs to avoid stale closures
+  const filtersRef = React.useRef(filters);
+  const onFiltersChangeRef = React.useRef(onFiltersChange);
+  
+  useEffect(() => {
+    filtersRef.current = filters;
+    onFiltersChangeRef.current = onFiltersChange;
+  });
+  
   useEffect(() => {
     const newMinPrice = debouncedMinPrice ? Number(debouncedMinPrice) : undefined;
-    if (newMinPrice !== filters.minPrice) {
-      onFiltersChange({ ...filters, minPrice: newMinPrice, page: 1 });
+    if (newMinPrice !== filtersRef.current.minPrice) {
+      onFiltersChangeRef.current({ ...filtersRef.current, minPrice: newMinPrice, page: 1 });
     }
   }, [debouncedMinPrice]);
   
   useEffect(() => {
     const newMaxPrice = debouncedMaxPrice ? Number(debouncedMaxPrice) : undefined;
-    if (newMaxPrice !== filters.maxPrice) {
-      onFiltersChange({ ...filters, maxPrice: newMaxPrice, page: 1 });
+    if (newMaxPrice !== filtersRef.current.maxPrice) {
+      onFiltersChangeRef.current({ ...filtersRef.current, maxPrice: newMaxPrice, page: 1 });
     }
   }, [debouncedMaxPrice]);
   
   useEffect(() => {
     const newMinSize = debouncedMinSize ? Number(debouncedMinSize) : undefined;
-    if (newMinSize !== filters.minSize) {
-      onFiltersChange({ ...filters, minSize: newMinSize, page: 1 });
+    if (newMinSize !== filtersRef.current.minSize) {
+      onFiltersChangeRef.current({ ...filtersRef.current, minSize: newMinSize, page: 1 });
     }
   }, [debouncedMinSize]);
   
   useEffect(() => {
     const newMaxSize = debouncedMaxSize ? Number(debouncedMaxSize) : undefined;
-    if (newMaxSize !== filters.maxSize) {
-      onFiltersChange({ ...filters, maxSize: newMaxSize, page: 1 });
+    if (newMaxSize !== filtersRef.current.maxSize) {
+      onFiltersChangeRef.current({ ...filtersRef.current, maxSize: newMaxSize, page: 1 });
     }
   }, [debouncedMaxSize]);
 
