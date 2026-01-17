@@ -1,8 +1,8 @@
-# PropFind - Real Estate Listings Platform
+# Dari.com - Real Estate Listings Platform
 
 ## Overview
 
-A comprehensive real estate marketplace where property owners can list properties for sale or rent, and buyers/renters can browse, search, and save favorite listings. The platform features an interactive map interface, multi-language support (English, Arabic with RTL, French), responsive design, and user authentication via Replit Auth.
+A comprehensive real estate marketplace called "Dari.com" (داري - meaning "my home" in Arabic) where property owners can list properties for sale or rent, and buyers/renters can browse, search, and save favorite listings. The platform features Mauritanian flag-inspired colors (green and gold), an interactive map interface, multi-language support (English, Arabic with RTL, French), responsive design, and user authentication via Replit Auth.
 
 ## Recent Changes
 

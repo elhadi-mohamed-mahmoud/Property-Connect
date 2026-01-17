@@ -79,7 +79,7 @@ export function Header() {
             {appSettings?.logoUrl ? (
               <img
                 src={appSettings.logoUrl}
-                alt="PropFind"
+                alt="Dari.com"
                 className="h-8 w-auto object-contain"
                 data-testid="img-app-logo"
               />
@@ -88,7 +88,7 @@ export function Header() {
                 <Home className="h-5 w-5 text-primary-foreground" />
               </div>
             )}
-            <span className="font-bold text-xl hidden sm:inline">PropFind</span>
+            <span className="font-bold text-xl hidden sm:inline">Dari.com</span>
           </div>
         </Link>
 
