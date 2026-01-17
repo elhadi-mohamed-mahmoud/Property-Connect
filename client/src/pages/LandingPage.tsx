@@ -44,15 +44,15 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-8 mt-12">
             <div className="flex items-center gap-2 text-white/80">
               <Building2 className="h-5 w-5" />
-              <span>1000+ Properties</span>
+              <span>{t("landing.stats.properties")}</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Users className="h-5 w-5" />
-              <span>500+ Happy Users</span>
+              <span>{t("landing.stats.users")}</span>
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <MapPin className="h-5 w-5" />
-              <span>50+ Locations</span>
+              <span>{t("landing.stats.locations")}</span>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function LandingPage() {
 
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose Dari.com?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">{t("landing.whyChoose")}</h2>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <Card className="text-center hover-elevate">
@@ -110,9 +110,9 @@ export default function LandingPage() {
 
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Find Your Dream Property?</h2>
+          <h2 className="text-3xl font-bold mb-4">{t("landing.readyToFind")}</h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of users who have found their perfect home through Dari.com.
+            {t("landing.joinThousands")}
           </p>
           <Button size="lg" asChild data-testid="footer-cta">
             <a href="/api/login">
@@ -124,7 +124,7 @@ export default function LandingPage() {
 
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Dari.com. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Dari.com. {t("footer.copyright")}</p>
         </div>
       </footer>
     </div>

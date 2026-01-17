@@ -153,6 +153,14 @@ const resources = {
         headline: "Your Dream Property Awaits",
         subheadline: "Browse thousands of properties for sale and rent across the country",
         cta: "Get Started",
+        stats: {
+          properties: "1000+ Properties",
+          users: "500+ Happy Users",
+          locations: "50+ Locations",
+        },
+        whyChoose: "Why Choose Dari.com?",
+        readyToFind: "Ready to Find Your Dream Property?",
+        joinThousands: "Join thousands of users who have found their perfect home through Dari.com.",
         features: {
           search: {
             title: "Smart Search",
@@ -167,6 +175,11 @@ const resources = {
             description: "Keep track of properties you love",
           },
         },
+      },
+      footer: {
+        tagline: "Your Home Awaits",
+        copyright: "All rights reserved.",
+        marketplace: "Real Estate Marketplace",
       },
       support: {
         title: "Contact Support",
@@ -345,6 +358,14 @@ const resources = {
         headline: "عقارك المثالي في انتظارك",
         subheadline: "تصفح آلاف العقارات للبيع والإيجار في جميع أنحاء البلاد",
         cta: "ابدأ الآن",
+        stats: {
+          properties: "+1000 عقار",
+          users: "+500 مستخدم سعيد",
+          locations: "+50 موقع",
+        },
+        whyChoose: "لماذا تختار داري؟",
+        readyToFind: "هل أنت مستعد للعثور على عقارك المثالي؟",
+        joinThousands: "انضم إلى آلاف المستخدمين الذين وجدوا منزلهم المثالي عبر داري.",
         features: {
           search: {
             title: "بحث ذكي",
@@ -359,6 +380,11 @@ const resources = {
             description: "تابع العقارات التي تعجبك",
           },
         },
+      },
+      footer: {
+        tagline: "داري - منزلك ينتظرك",
+        copyright: "جميع الحقوق محفوظة.",
+        marketplace: "سوق العقارات",
       },
       support: {
         title: "تواصل مع الدعم",
@@ -537,6 +563,14 @@ const resources = {
         headline: "Votre propriété de rêve vous attend",
         subheadline: "Parcourez des milliers de propriétés à vendre et à louer dans tout le pays",
         cta: "Commencer",
+        stats: {
+          properties: "1000+ Propriétés",
+          users: "500+ Utilisateurs satisfaits",
+          locations: "50+ Emplacements",
+        },
+        whyChoose: "Pourquoi choisir Dari.com?",
+        readyToFind: "Prêt à trouver votre propriété de rêve?",
+        joinThousands: "Rejoignez des milliers d'utilisateurs qui ont trouvé leur maison idéale grâce à Dari.com.",
         features: {
           search: {
             title: "Recherche intelligente",
@@ -551,6 +585,11 @@ const resources = {
             description: "Gardez une trace des propriétés que vous aimez",
           },
         },
+      },
+      footer: {
+        tagline: "Votre maison vous attend",
+        copyright: "Tous droits réservés.",
+        marketplace: "Marché immobilier",
       },
       support: {
         title: "Contacter le support",

@@ -16,16 +16,16 @@ export function Footer() {
               </div>
               <div>
                 <p className="font-bold text-lg">Dari.com</p>
-                <p className="text-xs text-muted-foreground">داري - Your Home Awaits</p>
+                <p className="text-xs text-muted-foreground">{t("footer.tagline")}</p>
               </div>
             </div>
           </Link>
           <div className="text-center md:text-right">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Dari.com. All rights reserved.
+              &copy; {new Date().getFullYear()} Dari.com. {t("footer.copyright")}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              dari.com | Real Estate Marketplace
+              dari.com | {t("footer.marketplace")}
             </p>
           </div>
         </div>
