@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 import type { PropertyFilters } from "@shared/schema";
 
 interface FilterPanelProps {
@@ -39,6 +40,55 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
   const { isRTL } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<string[]>(["category", "type", "price"]);
+  
+  // Local state for numeric inputs (for smooth typing experience)
+  const [localMinPrice, setLocalMinPrice] = useState<string>(filters.minPrice?.toString() || "");
+  const [localMaxPrice, setLocalMaxPrice] = useState<string>(filters.maxPrice?.toString() || "");
+  const [localMinSize, setLocalMinSize] = useState<string>(filters.minSize?.toString() || "");
+  const [localMaxSize, setLocalMaxSize] = useState<string>(filters.maxSize?.toString() || "");
+  
+  // Debounced values
+  const debouncedMinPrice = useDebounce(localMinPrice, 500);
+  const debouncedMaxPrice = useDebounce(localMaxPrice, 500);
+  const debouncedMinSize = useDebounce(localMinSize, 500);
+  const debouncedMaxSize = useDebounce(localMaxSize, 500);
+  
+  // Sync local state when filters change externally (e.g., clear filters)
+  useEffect(() => {
+    setLocalMinPrice(filters.minPrice?.toString() || "");
+    setLocalMaxPrice(filters.maxPrice?.toString() || "");
+    setLocalMinSize(filters.minSize?.toString() || "");
+    setLocalMaxSize(filters.maxSize?.toString() || "");
+  }, [filters.minPrice, filters.maxPrice, filters.minSize, filters.maxSize]);
+  
+  // Apply debounced values to filters
+  useEffect(() => {
+    const newMinPrice = debouncedMinPrice ? Number(debouncedMinPrice) : undefined;
+    if (newMinPrice !== filters.minPrice) {
+      onFiltersChange({ ...filters, minPrice: newMinPrice, page: 1 });
+    }
+  }, [debouncedMinPrice]);
+  
+  useEffect(() => {
+    const newMaxPrice = debouncedMaxPrice ? Number(debouncedMaxPrice) : undefined;
+    if (newMaxPrice !== filters.maxPrice) {
+      onFiltersChange({ ...filters, maxPrice: newMaxPrice, page: 1 });
+    }
+  }, [debouncedMaxPrice]);
+  
+  useEffect(() => {
+    const newMinSize = debouncedMinSize ? Number(debouncedMinSize) : undefined;
+    if (newMinSize !== filters.minSize) {
+      onFiltersChange({ ...filters, minSize: newMinSize, page: 1 });
+    }
+  }, [debouncedMinSize]);
+  
+  useEffect(() => {
+    const newMaxSize = debouncedMaxSize ? Number(debouncedMaxSize) : undefined;
+    if (newMaxSize !== filters.maxSize) {
+      onFiltersChange({ ...filters, maxSize: newMaxSize, page: 1 });
+    }
+  }, [debouncedMaxSize]);
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) =>
@@ -131,10 +181,8 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
             <Input
               type="number"
               placeholder="0"
-              value={filters.minPrice || ""}
-              onChange={(e) =>
-                updateFilter("minPrice", e.target.value ? Number(e.target.value) : undefined)
-              }
+              value={localMinPrice}
+              onChange={(e) => setLocalMinPrice(e.target.value)}
               data-testid="filter-min-price"
             />
           </div>
@@ -143,10 +191,8 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
             <Input
               type="number"
               placeholder="∞"
-              value={filters.maxPrice || ""}
-              onChange={(e) =>
-                updateFilter("maxPrice", e.target.value ? Number(e.target.value) : undefined)
-              }
+              value={localMaxPrice}
+              onChange={(e) => setLocalMaxPrice(e.target.value)}
               data-testid="filter-max-price"
             />
           </div>
@@ -200,10 +246,8 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
             <Input
               type="number"
               placeholder="0"
-              value={filters.minSize || ""}
-              onChange={(e) =>
-                updateFilter("minSize", e.target.value ? Number(e.target.value) : undefined)
-              }
+              value={localMinSize}
+              onChange={(e) => setLocalMinSize(e.target.value)}
               data-testid="filter-min-size"
             />
           </div>
@@ -212,10 +256,8 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
             <Input
               type="number"
               placeholder="∞"
-              value={filters.maxSize || ""}
-              onChange={(e) =>
-                updateFilter("maxSize", e.target.value ? Number(e.target.value) : undefined)
-              }
+              value={localMaxSize}
+              onChange={(e) => setLocalMaxSize(e.target.value)}
               data-testid="filter-max-size"
             />
           </div>
