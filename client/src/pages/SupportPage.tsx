@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Header } from "@/components/Header";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle, Mail, Headphones } from "lucide-react";
 import type { AppSettings } from "@shared/schema";
@@ -22,7 +23,9 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-4 py-8 max-w-2xl" dir={isRTL ? "rtl" : "ltr"}>
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
           <Headphones className="w-8 h-8 text-primary" />
@@ -119,6 +122,7 @@ export default function SupportPage() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

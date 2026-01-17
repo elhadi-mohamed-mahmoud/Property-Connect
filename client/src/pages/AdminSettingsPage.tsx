@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,39 +102,47 @@ export default function AdminSettingsPage() {
 
   if (checkingAdmin || loadingSettings) {
     return (
-      <div className="container mx-auto px-4 py-8 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8 flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
       </div>
     );
   }
 
   if (!adminCheck?.isAdmin) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-xl" dir={isRTL ? "rtl" : "ltr"}>
-        <Card>
-          <CardContent className="py-12 text-center">
-            <ShieldAlert className="w-12 h-12 mx-auto mb-4 text-destructive" />
-            <h2 className="text-xl font-semibold mb-2">{t("admin.adminOnly")}</h2>
-            <p className="text-muted-foreground">
-              You don't have permission to access this page.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8 max-w-xl" dir={isRTL ? "rtl" : "ltr"}>
+          <Card>
+            <CardContent className="py-12 text-center">
+              <ShieldAlert className="w-12 h-12 mx-auto mb-4 text-destructive" />
+              <h2 className="text-xl font-semibold mb-2">{t("admin.adminOnly")}</h2>
+              <p className="text-muted-foreground">
+                You don't have permission to access this page.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="flex items-center gap-3 mb-8">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-4 py-8 max-w-2xl" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="flex items-center gap-3 mb-8">
         <Settings className="w-8 h-8 text-primary" />
         <h1 className="text-3xl font-bold" data-testid="text-admin-title">
           {t("admin.title")}
         </h1>
-      </div>
+        </div>
 
-      <div className="space-y-6">
-        <Card>
+        <div className="space-y-6">
+          <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Image className="w-5 h-5" />
@@ -238,6 +247,7 @@ export default function AdminSettingsPage() {
             </Button>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );

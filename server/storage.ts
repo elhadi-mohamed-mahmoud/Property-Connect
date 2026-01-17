@@ -239,9 +239,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertProfile(profile: InsertUserProfile): Promise<UserProfile> {
+    // Check if any admin exists
+    const existingAdmins = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.isAdmin, true))
+      .limit(1);
+    
+    // Check if this user already exists
+    const existingUser = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, profile.userId))
+      .limit(1);
+    
+    // If no admins exist and this is a new user, make them admin
+    const makeAdmin = existingAdmins.length === 0 && existingUser.length === 0;
+    
     const [upserted] = await db
       .insert(userProfiles)
-      .values(profile)
+      .values({ 
+        userId: profile.userId,
+        displayName: profile.displayName,
+        phone: profile.phone,
+        whatsapp: profile.whatsapp,
+        preferredLanguage: profile.preferredLanguage,
+        isAdmin: makeAdmin ? true : undefined,
+      })
       .onConflictDoUpdate({
         target: userProfiles.userId,
         set: profile,
@@ -292,6 +316,22 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(appSettings)
       .where(eq(appSettings.id, "default"));
+    
+    // Seed default settings if none exist
+    if (!settings) {
+      const [seeded] = await db
+        .insert(appSettings)
+        .values({
+          id: "default",
+          supportPhone: "+1 (555) 123-4567",
+          supportWhatsapp: "+15551234567",
+          supportEmail: "support@propfind.com",
+          updatedAt: new Date(),
+        })
+        .returning();
+      return seeded;
+    }
+    
     return settings;
   }
 
