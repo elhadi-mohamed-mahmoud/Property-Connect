@@ -101,6 +101,9 @@ export class DatabaseStorage implements IStorage {
       conditions.push(lte(properties.size, filters.maxSize));
     }
 
+    // By default, exclude sold properties from listings
+    conditions.push(eq(properties.isSold, false));
+
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     let orderByClause;

@@ -112,7 +112,7 @@ export function ImageGallery({ images, alt = "Property image" }: ImageGalleryPro
       )}
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none z-[9999]">
           <Button
             variant="ghost"
             size="icon"

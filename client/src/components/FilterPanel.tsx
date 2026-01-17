@@ -42,59 +42,66 @@ export function FilterPanel({ filters, onFiltersChange, isMobile = false }: Filt
   const [expandedSections, setExpandedSections] = useState<string[]>(["category", "type", "price"]);
   
   // Local state for numeric inputs (for smooth typing experience)
-  const [localMinPrice, setLocalMinPrice] = useState<string>(filters.minPrice?.toString() || "");
-  const [localMaxPrice, setLocalMaxPrice] = useState<string>(filters.maxPrice?.toString() || "");
-  const [localMinSize, setLocalMinSize] = useState<string>(filters.minSize?.toString() || "");
-  const [localMaxSize, setLocalMaxSize] = useState<string>(filters.maxSize?.toString() || "");
+  const [localMinPrice, setLocalMinPrice] = useState<string>("");
+  const [localMaxPrice, setLocalMaxPrice] = useState<string>("");
+  const [localMinSize, setLocalMinSize] = useState<string>("");
+  const [localMaxSize, setLocalMaxSize] = useState<string>("");
   
-  // Debounced values
-  const debouncedMinPrice = useDebounce(localMinPrice, 500);
-  const debouncedMaxPrice = useDebounce(localMaxPrice, 500);
-  const debouncedMinSize = useDebounce(localMinSize, 500);
-  const debouncedMaxSize = useDebounce(localMaxSize, 500);
+  // Track if we should skip the next debounce update (to avoid loops)
+  const skipNextUpdate = React.useRef(false);
   
-  // Sync local state when filters change externally (e.g., clear filters)
+  // Only sync from filters when they are cleared (all become undefined)
+  const prevFiltersRef = React.useRef(filters);
   useEffect(() => {
-    setLocalMinPrice(filters.minPrice?.toString() || "");
-    setLocalMaxPrice(filters.maxPrice?.toString() || "");
-    setLocalMinSize(filters.minSize?.toString() || "");
-    setLocalMaxSize(filters.maxSize?.toString() || "");
+    const prev = prevFiltersRef.current;
+    // Detect clear: previous had value, now undefined
+    if (prev.minPrice !== undefined && filters.minPrice === undefined) {
+      setLocalMinPrice("");
+    }
+    if (prev.maxPrice !== undefined && filters.maxPrice === undefined) {
+      setLocalMaxPrice("");
+    }
+    if (prev.minSize !== undefined && filters.minSize === undefined) {
+      setLocalMinSize("");
+    }
+    if (prev.maxSize !== undefined && filters.maxSize === undefined) {
+      setLocalMaxSize("");
+    }
+    prevFiltersRef.current = filters;
   }, [filters.minPrice, filters.maxPrice, filters.minSize, filters.maxSize]);
   
-  // Apply debounced values to filters using refs to avoid stale closures
-  const filtersRef = React.useRef(filters);
-  const onFiltersChangeRef = React.useRef(onFiltersChange);
+  // Debounced values
+  const debouncedMinPrice = useDebounce(localMinPrice, 600);
+  const debouncedMaxPrice = useDebounce(localMaxPrice, 600);
+  const debouncedMinSize = useDebounce(localMinSize, 600);
+  const debouncedMaxSize = useDebounce(localMaxSize, 600);
   
-  useEffect(() => {
-    filtersRef.current = filters;
-    onFiltersChangeRef.current = onFiltersChange;
-  });
-  
+  // Apply debounced price values
   useEffect(() => {
     const newMinPrice = debouncedMinPrice ? Number(debouncedMinPrice) : undefined;
-    if (newMinPrice !== filtersRef.current.minPrice) {
-      onFiltersChangeRef.current({ ...filtersRef.current, minPrice: newMinPrice, page: 1 });
+    if (newMinPrice !== filters.minPrice) {
+      onFiltersChange({ ...filters, minPrice: newMinPrice, page: 1 });
     }
   }, [debouncedMinPrice]);
   
   useEffect(() => {
     const newMaxPrice = debouncedMaxPrice ? Number(debouncedMaxPrice) : undefined;
-    if (newMaxPrice !== filtersRef.current.maxPrice) {
-      onFiltersChangeRef.current({ ...filtersRef.current, maxPrice: newMaxPrice, page: 1 });
+    if (newMaxPrice !== filters.maxPrice) {
+      onFiltersChange({ ...filters, maxPrice: newMaxPrice, page: 1 });
     }
   }, [debouncedMaxPrice]);
   
   useEffect(() => {
     const newMinSize = debouncedMinSize ? Number(debouncedMinSize) : undefined;
-    if (newMinSize !== filtersRef.current.minSize) {
-      onFiltersChangeRef.current({ ...filtersRef.current, minSize: newMinSize, page: 1 });
+    if (newMinSize !== filters.minSize) {
+      onFiltersChange({ ...filters, minSize: newMinSize, page: 1 });
     }
   }, [debouncedMinSize]);
   
   useEffect(() => {
     const newMaxSize = debouncedMaxSize ? Number(debouncedMaxSize) : undefined;
-    if (newMaxSize !== filtersRef.current.maxSize) {
-      onFiltersChangeRef.current({ ...filtersRef.current, maxSize: newMaxSize, page: 1 });
+    if (newMaxSize !== filters.maxSize) {
+      onFiltersChange({ ...filters, maxSize: newMaxSize, page: 1 });
     }
   }, [debouncedMaxSize]);
 
