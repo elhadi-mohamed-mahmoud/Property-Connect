@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
@@ -49,6 +50,21 @@ export default function PropertyDetail() {
   const [, navigate] = useLocation();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const [showPhone, setShowPhone] = useState(false);
+
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window) ||
+           (navigator.maxTouchPoints > 0);
+  };
+
+  const handleCallClick = (phone: string) => {
+    if (isMobileDevice()) {
+      window.location.href = `tel:${phone}`;
+    } else {
+      setShowPhone(true);
+    }
+  };
 
   const { data: property, isLoading } = useQuery<Property>({
     queryKey: ["/api/properties", id],
@@ -355,12 +371,30 @@ export default function PropertyDetail() {
                 </div>
 
                 <div className="space-y-2">
-                  <Button className="w-full gap-2" size="lg" asChild>
-                    <a href={`tel:${property.contactPhone}`} data-testid="btn-call">
+                  {showPhone ? (
+                    <div className="space-y-2">
+                      <Button
+                        className="w-full gap-2"
+                        size="lg"
+                        asChild
+                      >
+                        <a href={`tel:${property.contactPhone}`} data-testid="btn-call-link">
+                          <Phone className="h-5 w-5" />
+                          {property.contactPhone}
+                        </a>
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      className="w-full gap-2"
+                      size="lg"
+                      onClick={() => handleCallClick(property.contactPhone)}
+                      data-testid="btn-call"
+                    >
                       <Phone className="h-5 w-5" />
                       {t("property.call")}
-                    </a>
-                  </Button>
+                    </Button>
+                  )}
 
                   {property.contactWhatsapp && (
                     <Button
