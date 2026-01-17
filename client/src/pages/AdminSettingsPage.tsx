@@ -121,7 +121,7 @@ export default function AdminSettingsPage() {
               <ShieldAlert className="w-12 h-12 mx-auto mb-4 text-destructive" />
               <h2 className="text-xl font-semibold mb-2">{t("admin.adminOnly")}</h2>
               <p className="text-muted-foreground">
-                You don't have permission to access this page.
+                {t("admin.noPermission")}
               </p>
             </CardContent>
           </Card>
@@ -149,7 +149,7 @@ export default function AdminSettingsPage() {
               {t("admin.appLogo")}
             </CardTitle>
             <CardDescription>
-              Upload a logo for your application
+              {t("admin.logoDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -188,7 +188,7 @@ export default function AdminSettingsPage() {
               {t("admin.supportContacts")}
             </CardTitle>
             <CardDescription>
-              Configure support contact information visible on the support page
+              {t("admin.contactsDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
