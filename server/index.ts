@@ -60,16 +60,36 @@ app.use((req, res, next) => {
   next();
 });
 
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  // Log the error but don't crash - let Railway handle restarts
+});
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  // Log the error but don't crash - let Railway handle restarts
+});
+
 (async () => {
-  await registerRoutes(httpServer, app);
+  try {
+    await registerRoutes(httpServer, app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      
+      // Log full error details for debugging
+      console.error("Express error:", {
+        message: err.message,
+        stack: err.stack,
+        status,
+      });
 
-    res.status(status).json({ message });
-    throw err;
-  });
+      res.status(status).json({ message });
+      // Don't throw here - error is already handled
+    });
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -98,10 +118,18 @@ app.use((req, res, next) => {
     listenOptions.reusePort = true;
   }
   
-  httpServer.listen(
-    listenOptions,
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
+    httpServer.listen(
+      listenOptions,
+      () => {
+        log(`serving on port ${port}`);
+      },
+    );
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+    process.exit(1);
+  }
 })();
