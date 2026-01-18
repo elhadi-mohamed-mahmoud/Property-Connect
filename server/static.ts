@@ -4,12 +4,13 @@ import path from "path";
 
 export function serveStatic(app: Express) {
   // In production, the built files are in dist/public
+  // __dirname will be 'dist' in the compiled file, so we resolve to dist/public
   // Try multiple possible paths to find the build directory
   const possiblePaths = [
-    path.resolve(process.cwd(), "dist", "public"),
-    path.resolve(process.cwd(), "public"),
-    path.resolve(__dirname, "..", "public"),
-    path.resolve(__dirname, "public"),
+    path.resolve(__dirname, "public"), // Most likely: dist/public (when __dirname is 'dist')
+    path.resolve(process.cwd(), "dist", "public"), // Fallback: from project root
+    path.resolve(process.cwd(), "public"), // Alternative location
+    path.resolve(__dirname, "..", "public"), // Another fallback
   ];
 
   let distPath: string | null = null;
@@ -25,6 +26,15 @@ export function serveStatic(app: Express) {
     console.error(`Could not find build directory. Tried paths:`, possiblePaths);
     console.error(`Current working directory: ${process.cwd()}`);
     console.error(`__dirname: ${__dirname}`);
+    // List what actually exists in the directories
+    try {
+      const distDir = path.resolve(__dirname);
+      const cwdDist = path.resolve(process.cwd(), "dist");
+      console.error(`Contents of ${distDir}:`, fs.existsSync(distDir) ? fs.readdirSync(distDir) : "does not exist");
+      console.error(`Contents of ${cwdDist}:`, fs.existsSync(cwdDist) ? fs.readdirSync(cwdDist) : "does not exist");
+    } catch (e) {
+      console.error(`Error listing directories:`, e);
+    }
     throw new Error(
       `Could not find the build directory. Tried: ${possiblePaths.join(", ")}. Make sure to build the client first.`,
     );
