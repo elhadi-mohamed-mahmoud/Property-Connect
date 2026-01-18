@@ -18,6 +18,11 @@ async function fetchUser(): Promise<User | null> {
 }
 
 async function logout(): Promise<void> {
+  // Clear any client-side storage
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Redirect to logout endpoint which will clear server-side session
   window.location.href = "/api/logout";
 }
 

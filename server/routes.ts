@@ -4,27 +4,41 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
+import { setupAuth, registerAuthRoutes, isAuthenticated, authStorage } from "./auth";
 import { insertPropertySchema, insertAppSettingsSchema } from "@shared/schema";
 import { z } from "zod";
+import {
+  isCloudinaryConfigured,
+  uploadToCloudinary,
+} from "./cloudinary";
 
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// Use memory storage when Cloudinary is configured (to upload to Cloudinary)
+// Otherwise use disk storage for local development
+const getMulterStorage = () => {
+  if (isCloudinaryConfigured()) {
+    // Use memory storage so we can upload to Cloudinary
+    return multer.memoryStorage();
+  }
+  
+  // Fallback to local disk storage
+  return multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+    },
+  });
+};
 
 const upload = multer({
-  storage: multerStorage,
+  storage: getMulterStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
     files: 10,
@@ -58,11 +72,20 @@ export async function registerRoutes(
   });
 
   // Image upload endpoint
-  app.post("/api/upload", isAuthenticated, upload.array("images", 10), (req: any, res) => {
+  app.post("/api/upload", isAuthenticated, upload.array("images", 10), async (req: any, res) => {
     try {
       const files = req.files as Express.Multer.File[];
-      const urls = files.map((file) => `/uploads/${file.filename}`);
-      res.json({ urls });
+      
+      if (isCloudinaryConfigured() && files.length > 0) {
+        // Upload files to Cloudinary
+        const uploadPromises = files.map((file) => uploadToCloudinary(file));
+        const urls = await Promise.all(uploadPromises);
+        res.json({ urls });
+      } else {
+        // Local storage - return relative paths
+        const urls = files.map((file) => `/uploads/${file.filename}`);
+        res.json({ urls });
+      }
     } catch (error) {
       console.error("Upload error:", error);
       res.status(500).json({ message: "Failed to upload images" });
@@ -133,7 +156,7 @@ export async function registerRoutes(
 
   app.post("/api/properties", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const validatedData = insertPropertySchema.parse(req.body);
       
       const property = await storage.createProperty({
@@ -153,7 +176,7 @@ export async function registerRoutes(
 
   app.patch("/api/properties/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const updates = req.body;
 
       const property = await storage.updateProperty(req.params.id, userId, updates);
@@ -170,7 +193,7 @@ export async function registerRoutes(
 
   app.delete("/api/properties/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       
       // Check if user is admin - admins can delete any property
       const isAdmin = await storage.isUserAdmin(userId);
@@ -195,9 +218,23 @@ export async function registerRoutes(
 
   app.get("/api/my-properties", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const properties = await storage.getPropertiesByUserId(userId);
       res.json(properties);
+    } catch (error) {
+      console.error("Error fetching user properties:", error);
+      res.status(500).json({ message: "Failed to fetch properties" });
+    }
+  });
+
+  // Get properties by user ID (public endpoint)
+  app.get("/api/users/:userId/properties", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const properties = await storage.getPropertiesByUserId(userId);
+      // Filter out sold properties for public view
+      const activeProperties = properties.filter(p => !p.isSold);
+      res.json(activeProperties);
     } catch (error) {
       console.error("Error fetching user properties:", error);
       res.status(500).json({ message: "Failed to fetch properties" });
@@ -207,7 +244,7 @@ export async function registerRoutes(
   // Favorites endpoints
   app.get("/api/favorites", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const properties = await storage.getFavoritesByUserId(userId);
       res.json(properties);
     } catch (error) {
@@ -218,7 +255,7 @@ export async function registerRoutes(
 
   app.get("/api/favorites/ids", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const ids = await storage.getFavoriteIdsByUserId(userId);
       res.json(ids);
     } catch (error) {
@@ -229,7 +266,7 @@ export async function registerRoutes(
 
   app.post("/api/favorites", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const { propertyId } = req.body;
 
       if (!propertyId) {
@@ -246,7 +283,7 @@ export async function registerRoutes(
 
   app.delete("/api/favorites/:propertyId", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const { propertyId } = req.params;
 
       await storage.removeFavorite(userId, propertyId);
@@ -260,7 +297,7 @@ export async function registerRoutes(
   // Profile endpoints
   app.get("/api/profile", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       let profile = await storage.getProfile(userId);
       
       if (!profile) {
@@ -279,8 +316,34 @@ export async function registerRoutes(
 
   app.put("/api/profile", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const { displayName, phone, whatsapp, preferredLanguage } = req.body;
+      const userId = req.user.claims?.sub || req.user.id;
+      const { displayName, phone, whatsapp, preferredLanguage, firstName, lastName } = req.body;
+
+      // Update user account (firstName/lastName) if provided
+      if (firstName !== undefined || lastName !== undefined || displayName) {
+        const currentUser = await authStorage.getUser(userId);
+        
+        // If displayName is provided, parse it into firstName/lastName
+        let firstNameToUpdate = firstName;
+        let lastNameToUpdate = lastName;
+        
+        if (displayName && !firstName && !lastName) {
+          // Parse displayName: "John Doe" -> firstName: "John", lastName: "Doe"
+          const nameParts = displayName.trim().split(/\s+/);
+          if (nameParts.length > 0) {
+            firstNameToUpdate = nameParts[0];
+            lastNameToUpdate = nameParts.slice(1).join(" ") || currentUser?.lastName || "";
+          }
+        }
+        
+        await authStorage.upsertUser({
+          id: userId,
+          email: currentUser?.email || "",
+          firstName: firstNameToUpdate !== undefined ? firstNameToUpdate : currentUser?.firstName,
+          lastName: lastNameToUpdate !== undefined ? lastNameToUpdate : currentUser?.lastName,
+          profileImageUrl: currentUser?.profileImageUrl,
+        });
+      }
 
       const profile = await storage.upsertProfile({
         userId,
@@ -310,7 +373,7 @@ export async function registerRoutes(
 
   app.patch("/api/app-settings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const isAdmin = await storage.isUserAdmin(userId);
       
       if (!isAdmin) {
@@ -348,7 +411,7 @@ export async function registerRoutes(
   // Admin check endpoint
   app.get("/api/admin/check", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.claims?.sub || req.user.id;
       const isAdmin = await storage.isUserAdmin(userId);
       res.json({ isAdmin });
     } catch (error) {

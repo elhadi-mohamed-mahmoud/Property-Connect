@@ -109,7 +109,12 @@ export default function PropertyDetail() {
       });
     },
     onSuccess: () => {
+      // Invalidate both the single property query and all property list queries
       queryClient.invalidateQueries({ queryKey: ["/api/properties", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      // Also invalidate user's properties list and favorites
+      queryClient.invalidateQueries({ queryKey: ["/api/my-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
       toast({
         title: t("common.success"),
       });
@@ -127,6 +132,11 @@ export default function PropertyDetail() {
       await apiRequest("DELETE", `/api/properties/${id}`);
     },
     onSuccess: () => {
+      // Invalidate all property queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      // Also invalidate user's properties list and favorites
+      queryClient.invalidateQueries({ queryKey: ["/api/my-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
       toast({
         title: t("common.success"),
       });
@@ -367,7 +377,13 @@ export default function PropertyDetail() {
               <CardContent className="space-y-4">
                 <div>
                   <p className="text-sm text-muted-foreground">{t("property.listedBy")}</p>
-                  <p className="font-medium" data-testid="contact-name">{property.contactName}</p>
+                  <button
+                    onClick={() => navigate(`/user/${property.userId}/listings`)}
+                    className="font-medium hover:text-primary transition-colors text-left underline-offset-4 hover:underline cursor-pointer"
+                    data-testid="contact-name"
+                  >
+                    {property.contactName}
+                  </button>
                 </div>
 
                 <div className="space-y-2">

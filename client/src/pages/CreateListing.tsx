@@ -32,7 +32,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import type { Property } from "@shared/schema";
+import type { Property, UserProfile } from "@shared/schema";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required").max(255),
@@ -48,7 +48,6 @@ const formSchema = z.object({
   videoUrl: z.string().url().optional().or(z.literal("")),
   tiktokUrl: z.string().url().optional().or(z.literal("")),
   facebookUrl: z.string().url().optional().or(z.literal("")),
-  contactName: z.string().min(1, "Contact name is required"),
   contactPhone: z.string().min(1, "Contact phone is required"),
   contactWhatsapp: z.string().optional(),
   bedrooms: z.preprocess((val) => (val === "" || val === undefined ? undefined : Number(val)), z.number().int().positive().optional()),
@@ -56,7 +55,10 @@ const formSchema = z.object({
   size: z.preprocess((val) => (val === "" || val === undefined ? undefined : Number(val)), z.number().int().positive().optional()),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof formSchema> & {
+  contactName?: string; // Will be auto-populated, not in form
+};
+
 
 export default function CreateListing() {
   const { t } = useTranslation();
@@ -76,6 +78,16 @@ export default function CreateListing() {
     enabled: isEditing,
   });
 
+  const { data: profile } = useQuery<UserProfile | null>({
+    queryKey: ["/api/profile"],
+    queryFn: async () => {
+      const response = await fetch("/api/profile", { credentials: "include" });
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: isAuthenticated,
+  });
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -92,7 +104,6 @@ export default function CreateListing() {
       videoUrl: "",
       tiktokUrl: "",
       facebookUrl: "",
-      contactName: "",
       contactPhone: "",
       contactWhatsapp: "",
       bedrooms: undefined,
@@ -108,10 +119,16 @@ export default function CreateListing() {
   }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
-    if (user && !isEditing) {
-      form.setValue("contactName", user.firstName || user.email?.split("@")[0] || "");
+    if (profile && !isEditing) {
+      // Auto-populate phone and WhatsApp from profile
+      if (profile.phone) {
+        form.setValue("contactPhone", profile.phone);
+      }
+      if (profile.whatsapp) {
+        form.setValue("contactWhatsapp", profile.whatsapp);
+      }
     }
-  }, [user, form, isEditing]);
+  }, [profile, form, isEditing]);
 
   useEffect(() => {
     if (existingProperty) {
@@ -129,7 +146,6 @@ export default function CreateListing() {
         videoUrl: existingProperty.videoUrl || "",
         tiktokUrl: existingProperty.tiktokUrl || "",
         facebookUrl: existingProperty.facebookUrl || "",
-        contactName: existingProperty.contactName,
         contactPhone: existingProperty.contactPhone,
         contactWhatsapp: existingProperty.contactWhatsapp || "",
         bedrooms: existingProperty.bedrooms || undefined,
@@ -141,8 +157,19 @@ export default function CreateListing() {
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
+      // Auto-populate contactName from user account (always use account name)
+      let contactName = "";
+      if (profile?.displayName) {
+        contactName = profile.displayName;
+      } else if (user) {
+        const firstName = user.firstName || "";
+        const lastName = user.lastName || "";
+        contactName = [firstName, lastName].filter(Boolean).join(" ") || user.email?.split("@")[0] || "";
+      }
+
       const payload = {
         ...data,
+        contactName,
         videoUrl: data.videoUrl || null,
         tiktokUrl: data.tiktokUrl || null,
         facebookUrl: data.facebookUrl || null,
@@ -164,7 +191,16 @@ export default function CreateListing() {
       toast({
         title: t("common.success"),
       });
+      // Invalidate all property list queries to refresh the homepage and other pages
       queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      // Invalidate the specific property query
+      queryClient.invalidateQueries({ queryKey: ["/api/properties", result.id] });
+      if (isEditing && id) {
+        queryClient.invalidateQueries({ queryKey: ["/api/properties", id] });
+      }
+      // Also invalidate user's properties list and favorites
+      queryClient.invalidateQueries({ queryKey: ["/api/my-properties"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
       navigate(isEditing ? `/property/${id}` : `/property/${result.id}`);
     },
     onError: () => {
@@ -553,20 +589,6 @@ export default function CreateListing() {
                 <CardTitle>{t("form.contactInfo")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="contactName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("form.contactName")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} data-testid="input-contact-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="contactPhone"

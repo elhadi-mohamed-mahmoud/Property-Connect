@@ -13,8 +13,10 @@ import PropertyDetail from "@/pages/PropertyDetail";
 import CreateListing from "@/pages/CreateListing";
 import FavoritesPage from "@/pages/FavoritesPage";
 import ProfilePage from "@/pages/ProfilePage";
+import UserListingsPage from "@/pages/UserListingsPage";
 import SupportPage from "@/pages/SupportPage";
 import AdminSettingsPage from "@/pages/AdminSettingsPage";
+import LoginPage from "@/pages/LoginPage";
 import NotFound from "@/pages/not-found";
 
 function AppRoutes() {
@@ -31,11 +33,13 @@ function AppRoutes() {
   return (
     <Switch>
       <Route path="/" component={isAuthenticated ? HomePage : LandingPage} />
+      <Route path="/login" component={LoginPage} />
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/create" component={CreateListing} />
       <Route path="/edit/:id" component={CreateListing} />
       <Route path="/favorites" component={FavoritesPage} />
       <Route path="/profile" component={ProfilePage} />
+      <Route path="/user/:userId/listings" component={UserListingsPage} />
       <Route path="/support" component={SupportPage} />
       <Route path="/admin/settings" component={AdminSettingsPage} />
       <Route component={NotFound} />

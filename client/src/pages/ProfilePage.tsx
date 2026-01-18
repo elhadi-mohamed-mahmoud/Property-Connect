@@ -93,15 +93,38 @@ export default function ProfilePage() {
         whatsapp: profile.whatsapp || "",
         preferredLanguage: profile.preferredLanguage || language,
       });
+      // Apply language from profile if it's different
+      if (profile.preferredLanguage && profile.preferredLanguage !== language) {
+        setLanguage(profile.preferredLanguage);
+      }
     }
-  }, [profile, form, language]);
+  }, [profile, form, language, setLanguage]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      return await apiRequest("PUT", "/api/profile", data);
+      // Parse displayName into firstName and lastName
+      let firstName: string | undefined;
+      let lastName: string | undefined;
+      
+      if (data.displayName) {
+        const nameParts = data.displayName.trim().split(/\s+/);
+        if (nameParts.length > 0) {
+          firstName = nameParts[0];
+          lastName = nameParts.slice(1).join(" ") || undefined;
+        }
+      }
+      
+      return await apiRequest("PUT", "/api/profile", {
+        ...data,
+        firstName,
+        lastName,
+      });
     },
     onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/profile"] });
+      // Invalidate user query to refresh user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Apply language change immediately
       if (data.preferredLanguage) {
         setLanguage(data.preferredLanguage);
       }

@@ -127,6 +127,14 @@ const resources = {
         empty: "You haven't saved any favorites yet.",
         browse: "Browse Properties",
       },
+      userListings: {
+        title: "{{name}}'s Listings",
+        titleDefault: "User Listings",
+        listingsCount: "{{count}} listing",
+        listingsCount_plural: "{{count}} listings",
+        empty: "This user hasn't published any listings yet.",
+        browseAll: "Browse All Properties",
+      },
       common: {
         loading: "Loading...",
         error: "Something went wrong",
@@ -335,6 +343,14 @@ const resources = {
         empty: "لم تحفظ أي عقارات في المفضلة بعد.",
         browse: "تصفح العقارات",
       },
+      userListings: {
+        title: "عقارات {{name}}",
+        titleDefault: "عقارات المستخدم",
+        listingsCount: "{{count}} إعلان",
+        listingsCount_plural: "{{count}} إعلان",
+        empty: "لم ينشر هذا المستخدم أي إعلانات بعد.",
+        browseAll: "تصفح جميع العقارات",
+      },
       common: {
         loading: "جاري التحميل...",
         error: "حدث خطأ ما",
@@ -542,6 +558,14 @@ const resources = {
         title: "Mes favoris",
         empty: "Vous n'avez pas encore de favoris.",
         browse: "Parcourir les propriétés",
+      },
+      userListings: {
+        title: "Annonces de {{name}}",
+        titleDefault: "Annonces de l'utilisateur",
+        listingsCount: "{{count}} annonce",
+        listingsCount_plural: "{{count}} annonces",
+        empty: "Cet utilisateur n'a pas encore publié d'annonces.",
+        browseAll: "Parcourir toutes les propriétés",
       },
       common: {
         loading: "Chargement...",
