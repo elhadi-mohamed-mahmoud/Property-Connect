@@ -35,9 +35,25 @@ export function serveStatic(app: Express) {
     } catch (e) {
       console.error(`Error listing directories:`, e);
     }
-    throw new Error(
-      `Could not find the build directory. Tried: ${possiblePaths.join(", ")}. Make sure to build the client first.`,
-    );
+    
+    // Instead of throwing, log error and serve a diagnostic response
+    // This allows the app to start so we can see what's wrong
+    console.error("WARNING: Static files not found. App will start but serve diagnostic info.");
+    app.use("*", (_req, res) => {
+      res.status(500).json({ 
+        error: "Static files not found. Check build process.",
+        diagnostic: {
+          paths: possiblePaths,
+          cwd: process.cwd(),
+          dirname: __dirname,
+          distExists: fs.existsSync(path.resolve(process.cwd(), "dist")),
+          distContents: fs.existsSync(path.resolve(process.cwd(), "dist")) 
+            ? fs.readdirSync(path.resolve(process.cwd(), "dist"))
+            : "dist directory does not exist"
+        }
+      });
+    });
+    return; // Don't throw - let the app start
   }
 
   app.use(express.static(distPath));
